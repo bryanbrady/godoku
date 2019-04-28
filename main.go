@@ -1,7 +1,10 @@
 package main
 
 import (
+    "bufio"
     "fmt"
+    "flag"
+    "log"
     "os"
     "strconv"
 )
@@ -14,12 +17,31 @@ type Cell struct {
 }
 
 func main() {
-  grid := parseGrid(os.Args[1])
-  fmt.Println("Original Puzzle:")
-  printGrid(grid)
-  solveBruteForce(nil, &grid)
-  fmt.Println("Solution:")
-  printGrid(grid)
+  filePtr := flag.String("file", "", "puzzle file, 1 puzzle per line")
+  flag.Parse()
+  if *filePtr != "" {
+    file, err := os.Open(*filePtr)
+    if err != nil {
+      log.Fatalf("failed opening file: %s", err)
+    }
+    scanner := bufio.NewScanner(file)
+    scanner.Split(bufio.ScanLines)
+    for scanner.Scan() {
+      solve(scanner.Text())
+    }
+  } else {
+    for _, e := range flag.Args() {
+      solve(e)
+    }
+  }
+}
+
+func solve(s string) {
+  grid := parseGrid(s)
+  fmt.Printf("Original: %s\n", s)
+  solveBruteForce(emptyCells(&grid), &grid)
+  fmt.Printf("Solution: ")
+  printString(grid)
 }
 
 func parseGrid(s string) [gridSize][gridSize]int {
@@ -31,6 +53,15 @@ func parseGrid(s string) [gridSize][gridSize]int {
     }
   }
   return grid
+}
+
+func printString(grid [gridSize][gridSize]int) {
+  for r := 0; r < gridSize; r++ {
+    for c := 0; c < gridSize; c++ {
+      fmt.Printf("%d",grid[r][c])
+    }
+  }
+  fmt.Println("")
 }
 
 func printGrid(grid [gridSize][gridSize]int) {
@@ -53,26 +84,17 @@ func solveBruteForce(cells []Cell, grid *[gridSize][gridSize]int) bool {
     return true
   }
 
-  if cells == nil {
-    cells = emptyCells(*grid)
-  }
-
-  if len(cells) == 0 {
-    return false
-  }
-
   c := cells[0]
   for v := 1; v <= 9; v++ {
-    if !hasEmpty(*grid) && isValid(*grid) {
-      return true
-    }
     grid[c.Row][c.Col] = v
     if isValid(*grid) {
-      solveBruteForce(cells[1:], grid)
+      if solveBruteForce(cells[1:], grid) {
+        return true
+      }
+      grid[c.Row][c.Col] = 0
     } else {
       grid[c.Row][c.Col] = 0
     }
-
   }
   return false
 }
@@ -88,7 +110,7 @@ func hasEmpty(grid[gridSize][gridSize]int) bool {
   return false
 }
 
-func emptyCells(grid[gridSize][gridSize]int) []Cell {
+func emptyCells(grid *[gridSize][gridSize]int) []Cell {
   var cells []Cell
   for r := 0; r < gridSize; r++ {
     for c := 0; c < gridSize; c++ {
