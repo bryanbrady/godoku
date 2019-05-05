@@ -1,4 +1,4 @@
-package godoku1
+package solver3
 
 import (
     "fmt"
@@ -56,14 +56,14 @@ func printGrid(grid [gridSize][gridSize]int) {
 }
 
 func solveBruteForce(cells []Cell, grid *[gridSize][gridSize]int) bool {
-  if !hasEmpty(*grid) && isValid(*grid) {
+  if !hasEmpty(grid) && isValid(grid) {
     return true
   }
 
   c := cells[0]
   for v := 1; v <= 9; v++ {
     grid[c.Row][c.Col] = v
-    if isValid(*grid) {
+    if isValid(grid) {
       if solveBruteForce(cells[1:], grid) {
         return true
       }
@@ -75,7 +75,7 @@ func solveBruteForce(cells []Cell, grid *[gridSize][gridSize]int) bool {
   return false
 }
 
-func hasEmpty(grid[gridSize][gridSize]int) bool {
+func hasEmpty(grid *[gridSize][gridSize]int) bool {
   for r := 0; r < gridSize; r++ {
     for c := 0; c < gridSize; c++ {
       if grid[r][c] == 0 {
@@ -98,7 +98,7 @@ func emptyCells(grid *[gridSize][gridSize]int) []Cell {
   return cells
 }
 
-func isValid(grid [gridSize][gridSize]int) bool {
+func isValid(grid *[gridSize][gridSize]int) bool {
   for i := 0; i < gridSize; i++ {
     switch {
     case !isRowValid(i, grid):
@@ -112,10 +112,11 @@ func isValid(grid [gridSize][gridSize]int) bool {
   return true
 }
 
-func isRowValid(row int, grid [gridSize][gridSize]int) bool {
-  used := make(map[int]bool)
+func isRowValid(row int, grid *[gridSize][gridSize]int) bool {
+  used := [10]bool{}
+  var g = 0
   for c := 0; c < gridSize; c++ {
-    g := grid[row][c]
+    g = grid[row][c]
     if g !=0 && used[g] {
       return false
     }
@@ -124,8 +125,8 @@ func isRowValid(row int, grid [gridSize][gridSize]int) bool {
   return true
 }
 
-func isColValid(col int, grid [gridSize][gridSize]int) bool {
-  used := make(map[int]bool)
+func isColValid(col int, grid *[gridSize][gridSize]int) bool {
+  used := [10]bool{}
   for r := 0; r < gridSize; r++ {
     g := grid[r][col]
     if g !=0 && used[g] {
@@ -151,8 +152,8 @@ func isColValid(col int, grid [gridSize][gridSize]int) bool {
 // |     |     |     |
 // +-----+-----+-----+
 
-func isSubGridValid(sub int, grid[gridSize][gridSize]int) bool {
-  used := make(map[int]bool)
+func isSubGridValid(sub int, grid *[gridSize][gridSize]int) bool {
+  used := [10]bool{}
   r_offset := sub / 3
   c_offset := sub % 3
   for r := 0; r < 3; r++ {

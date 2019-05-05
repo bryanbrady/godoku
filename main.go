@@ -1,9 +1,9 @@
 package main
 
 import (
-    "github.com/bryanbrady/godoku/godoku1"
-    "github.com/bryanbrady/godoku/godoku2"
-    "github.com/bryanbrady/godoku/godoku3"
+    "github.com/bryanbrady/godoku/solver1"
+    "github.com/bryanbrady/godoku/solver2"
+    "github.com/bryanbrady/godoku/solver3"
     "bufio"
     "flag"
     "log"
@@ -21,16 +21,16 @@ type Cell struct {
 var filePtr    = flag.String("file", "", "puzzle file, 1 puzzle per line")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 var solver     = flag.Int("solver", 1, "1, 2, 3")
-var solve = godoku1.Solve
+var solve      = solver1.Solve
 func main() {
   flag.Parse()
   switch *solver {
   case 1:
-    solve = godoku1.Solve
+    solve = solver1.Solve
   case 2:
-    solve = godoku2.Solve
+    solve = solver2.Solve
   case 3:
-    solve = godoku3.Solve
+    solve = solver3.Solve
   }
   if *cpuprofile != "" {
     f, err := os.Create(*cpuprofile)

@@ -1,4 +1,4 @@
-package godoku2
+package solver2 
 
 import (
     "fmt"
