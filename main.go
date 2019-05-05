@@ -7,6 +7,7 @@ import (
     "log"
     "os"
     "strconv"
+    "runtime/pprof"
 )
 
 const gridSize = 9
@@ -16,9 +17,18 @@ type Cell struct {
   Col int
 }
 
+var filePtr    = flag.String("file", "", "puzzle file, 1 puzzle per line")
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 func main() {
-  filePtr := flag.String("file", "", "puzzle file, 1 puzzle per line")
   flag.Parse()
+  if *cpuprofile != "" {
+    f, err := os.Create(*cpuprofile)
+    if err != nil {
+        log.Fatal(err)
+    }
+    pprof.StartCPUProfile(f)
+    defer pprof.StopCPUProfile()
+  }
   if *filePtr != "" {
     file, err := os.Open(*filePtr)
     if err != nil {
